@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <img src="./public/assets/wii-logo.svg" alt="Wii Logo" width="200" style="margin-bottom: 20px;" />
+  
+  <h1>Mee-Channel</h1>
+  <p><strong>A personal portfolio inspired by the classic Wii interface, with a modern and personal twist.</strong></p>
 
-## Getting Started
+  <p>
+    <img src="https://img.shields.io/badge/Status-Currently%20in%20Development-blue?style=for-the-badge" alt="Status" />
+    <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react" alt="React" />
+    <img src="https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind" />
+  </p>
+</div>
 
-First, run the development server:
+---
+
+## 🎮 About The Project
+
+This is a creative portfolio built from scratch to simulate the nostalgic feel of the Nintendo Wii Menu.
+It's currently under active development, but it already features:
+
+- 📺 **Interactive Channel Grid:** Just like the original menu!
+- 🖱️ **Custom Wii Cursor:** Powered by a requestAnimationFrame loop.
+- 👓 **3D Modals:** Expansion effects and CRT scanline overlays.
+- 📡 **Dynamic Data:** Real-time integration with the GitHub API.
+- ✉️ **Message Board:** A functional messages page with interactive 3D envelopes.
+
+*More personal tweaks, channels, and easter eggs coming soon!*
+
+## 🛠️ Built With
+
+- **Framework:** Next.js (App Router)
+- **Styling:** Tailwind CSS + Vanilla CSS (for complex 3D animations and CRT effects)
+- **Language:** TypeScript
+- **Icons & Assets:** Custom SVGs and Lucide-React
+
+## 🚀 Running Locally
+
+Want to explore the source code?
 
 ```bash
+# Clone the repository
+git clone https://github.com/gajonormal/Mee-Channel.git
+
+# Navigate to the folder
+cd Mee-Channel
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the magic.
