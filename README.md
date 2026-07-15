@@ -2,7 +2,8 @@
   <img src="./public/assets/wii-logo.svg" alt="Wii Logo" width="200" style="margin-bottom: 20px;" />
   
   <h1>Mee-Channel</h1>
-  <p><strong>A personal portfolio inspired by the classic Wii interface, with a modern and personal twist.</strong></p>
+  <h3>Personal Portfolio</h3>
+  <p><strong>A personal portfolio inspired by the classic Wii interface, with some personal twists.</strong></p>
 
   <p>
     <img src="https://img.shields.io/badge/Status-Currently%20in%20Development-blue?style=for-the-badge" alt="Status" />
@@ -14,29 +15,29 @@
 
 ---
 
-## 🎮 About The Project
+## About The Project
 
-This is a creative portfolio built from scratch to simulate the nostalgic feel of the Nintendo Wii Menu.
+This is a creative portfolio built to simulate the nostalgic feel of the Nintendo Wii Menu.
 It's currently under active development, but it already features:
 
-- 📺 **Interactive Channel Grid:** Just like the original menu!
-- 🖱️ **Custom Wii Cursor:** Powered by a requestAnimationFrame loop.
-- 👓 **3D Modals:** Expansion effects and CRT scanline overlays.
-- 📡 **Dynamic Data:** Real-time integration with the GitHub API.
-- ✉️ **Message Board:** A functional messages page with interactive 3D envelopes.
+- **Interactive Channel Grid:** Just like the official Wii menu
+- **Custom Wii Cursor:** A custom cursor that replicates the cursor from the Wii
+- **3D Modals:** Expansion effects and CRT scanline overlays
+- **Dynamic Data:** Real time integration with the GitHub API
+- **Message Board:** A functional messages page with interactive envelopes
 
-*More personal tweaks, channels, and easter eggs coming soon!*
+*Some more personal tweaks and some easter eggs comming soon*
 
 ## 🛠️ Built With
 
 - **Framework:** Next.js (App Router)
-- **Styling:** Tailwind CSS + Vanilla CSS (for complex 3D animations and CRT effects)
+- **Styling:** Tailwind CSS + Vanilla CSS (for 3D animations and CRT effects)
 - **Language:** TypeScript
 - **Icons & Assets:** Custom SVGs and Lucide-React
 
 ## 🚀 Running Locally
 
-Want to explore the source code?
+If you want to explore the source code ->
 
 ```bash
 # Clone the repository
