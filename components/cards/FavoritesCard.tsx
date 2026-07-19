@@ -1,4 +1,5 @@
 import Card from "../Card";
+import { useChannelBanner } from "../ChannelBannerContext";
 
 const favorites = [
   { emoji: "🎵", label: "MGMT", sub: "music" },
@@ -7,9 +8,42 @@ const favorites = [
 ];
 
 export default function FavoritesCard() {
+  const { openBanner } = useChannelBanner();
+
+  const handleOpen = (rect?: DOMRect) => {
+    openBanner({
+      id: "favorites",
+      title: "Favoritos",
+      href: "#",
+      originRect: rect,
+      bannerContent: (
+        <div className="flex flex-col items-center justify-center animate-bounce-slow gap-8">
+          <div className="flex justify-center gap-6">
+            {favorites.map((fav, i) => (
+              <div 
+                key={fav.label} 
+                className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-lg flex flex-col items-center gap-4 transition-transform hover:scale-110 hover:-translate-y-4"
+                style={{ animationDelay: `${i * 150}ms` }}
+              >
+                <span className="text-6xl drop-shadow-md">{fav.emoji}</span>
+                <div className="text-center">
+                  <h3 className="text-white text-xl font-bold">{fav.label}</h3>
+                  <p className="text-purple-300 text-sm uppercase tracking-widest">{fav.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <h2 className="text-3xl mt-4 text-[#888] font-bold tracking-widest drop-shadow-md text-center">
+            OS MEUS FAVORITOS
+          </h2>
+        </div>
+      ),
+    });
+  };
+
   return (
     <Card
-      href="#"
+      onClick={handleOpen}
       additionalClasses="hover:scale-100 bg-gradient-to-br from-[#1c1c2e] to-[#2d1b69]"
     >
       <div className="px-4 py-3 flex flex-col justify-between h-full w-full">

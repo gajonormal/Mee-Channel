@@ -30,18 +30,19 @@ export default function MessageCard({
     }
   }, [isOpen]);
 
-  const pinGradients = {
-    red: "from-[#ff7a7a] via-[#e60000] to-[#8a0000]",
-    orange: "from-[#ffcd7a] via-[#ff8800] to-[#b35e00]"
+  const pinBackgrounds = {
+    red: "linear-gradient(to bottom, #FFE999 5%, #FF4D4D 45%, #C21919 100%)",
+    orange: "linear-gradient(to bottom, #FFE999 5%, #FF9500 45%, #B34700 100%)"
   };
 
   const innerContent = (
     <>
       <div className={`absolute top-[-10px] sm:top-[-12px] left-1/2 -translate-x-1/2 ${isOpen ? 'z-0 opacity-0' : 'z-50 opacity-100'}`}>
         <div className={!isOpen && hasBeenOpened ? 'animate-pin-stab' : ''}>
-          <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow-[0_4px_8px_rgba(0,0,0,0.35),inset_-2px_-3px_5px_rgba(0,0,0,0.4),inset_1px_2px_4px_rgba(255,255,255,0.9)] bg-gradient-to-br ${pinGradients[pinColor]}`}>
-            <div className="absolute top-[8%] left-[15%] w-[70%] h-[45%] bg-gradient-to-b from-white/90 to-white/0 rounded-[50%] blur-[0.5px]" />
-          </div>
+          <div 
+            className={`relative w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow-[1px_2px_3px_rgba(0,0,0,0.25),inset_-1px_-2px_2px_rgba(0,0,0,0.25),inset_1px_1px_2px_rgba(255,255,255,0.4)] ${pinColor === 'red' ? 'border-2 border-[#8A1717]' : 'border-2 border-[#8A3A00]'}`}
+            style={{ background: pinBackgrounds[pinColor] }}
+          />
         </div>
       </div>
 
@@ -93,10 +94,6 @@ export default function MessageCard({
         </svg>
       </div>
 
-      {/* Texto da Wii depois vou subsituir por uma logo ou tirar completamente  */}
-      <div className={`absolute w-full flex justify-center z-50 pointer-events-none transition-all duration-300 ease-in-out ${isOpen ? 'top-[-15%] opacity-0 delay-0' : 'top-[28%] opacity-60 delay-300'}`}>
-        <span className="text-[#EADD9A] text-xl font-bold tracking-widest" style={{ fontFamily: 'Arial, sans-serif' }}>Wii</span>
-      </div>
 
       {/* Conteudo que esta na carta */}
       <div className="relative z-50 w-full h-full pointer-events-none">

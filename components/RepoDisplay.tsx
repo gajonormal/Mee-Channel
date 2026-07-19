@@ -63,8 +63,8 @@ export default function RepoDisplay({ repo }: RepoDisplayProps) {
 
   return (
     <div className="flex flex-col items-center justify-center gap-0.5 select-none">
-      <p className="text-[9px] sm:text-[10px] font-semibold text-center whitespace-nowrap text-[#010313]/40 uppercase tracking-[0.15em] leading-none flex items-center gap-1">
-        <span className="inline-block w-1 h-1 rounded-full bg-green-500 animate-pulse shrink-0" />
+      <p className="text-[9px] sm:text-[10px] font-semibold text-center whitespace-nowrap text-[#010313]/40 uppercase tracking-[0.15em] leading-none flex items-center gap-1.5">
+        <img src="/assets/github.svg" alt="GitHub" className="w-3.5 h-3.5 brightness-0 opacity-80 animate-pulse -translate-y-[1px]" />
         currently working on
       </p>
       <p className="text-2xl sm:text-3xl font-semibold text-center text-[#010313]/60 leading-none tabular-nums whitespace-nowrap">

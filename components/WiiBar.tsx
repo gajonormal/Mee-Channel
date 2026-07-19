@@ -65,7 +65,7 @@ export default async function WiiBar() {
         </div>
 
         {/* O container principal da janela do Mii */}
-        <div className="relative w-14 h-14 sm:h-28 sm:w-28 transition-transform active:scale-95">
+        <div className="relative w-14 h-14 sm:h-28 sm:w-28 transition-transform active:scale-95" style={{ transform: 'translateZ(0)' }}>
           
           {/* Camada 1: O fundo cinzento e o Mii normal cortado lá dentro */}
           <div className="absolute inset-0 rounded-full bg-[#E5E6E7] shadow-[inset_0_4px_10px_rgba(0,0,0,0.15)] ring-1 sm:ring-2 ring-[#C5C7CA] overflow-hidden">
@@ -80,7 +80,7 @@ export default async function WiiBar() {
           {/* Clip path de cima solta para o Mii aparecer meio fora do circulo */}
           <div 
             className="absolute inset-0 pointer-events-none z-20"
-            style={{ clipPath: "inset(-150px -150px 50% -150px)" }}
+            style={{ clipPath: "inset(-150px -150px 50% -150px)", transform: 'translateZ(0)' }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

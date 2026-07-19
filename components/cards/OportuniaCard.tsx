@@ -1,9 +1,43 @@
 import Card from "../Card";
+import { useChannelBanner } from "../ChannelBannerContext";
 
 export default function OportuniaCard() {
+  const { openBanner } = useChannelBanner();
+
+  const handleOpen = (rect?: DOMRect) => {
+    openBanner({
+      id: "oportunia",
+      title: "Oportunia",
+      href: "#",
+      originRect: rect,
+      bannerContent: (
+        <div className="flex flex-col items-center justify-center animate-bounce-slow">
+          <div className="relative mb-6">
+            <svg
+              className="w-40 h-40 drop-shadow-[0_0_20px_rgba(251,146,60,0.6)]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(251, 146, 60, 1)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+            <div className="absolute inset-0 bg-orange-500/20 blur-2xl rounded-full animate-pulse" />
+          </div>
+          <h2 className="text-3xl text-[#555] font-bold tracking-widest drop-shadow-md text-center">
+            PLATAFORMA
+          </h2>
+        </div>
+      ),
+    });
+  };
+
   return (
     <Card
-      href="#"
+      onClick={handleOpen}
       additionalClasses="hover:scale-100 bg-gradient-to-br from-[#1a0a00] to-[#7c2d12]"
     >
       <div className="px-[22px] py-4 flex flex-col justify-end items-start text-white h-full overflow-hidden">

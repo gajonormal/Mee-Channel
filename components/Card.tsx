@@ -26,14 +26,14 @@ export default function Card({
   const filterId = useId().replace(/:/g, "");
 
   const shadowParentClass = clsx(
-    "relative w-72 h-40 group block text-left",
+    "relative w-72 h-40 group block text-left transform-gpu",
     soft 
       ? "drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]" 
       : "drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)] hover:[filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.12))_drop-shadow(0_0_8px_rgba(0,176,240,0.25))] transition-all duration-200"
   );
 
   const maskedCardClass = clsx(
-    "flex relative w-full h-full transition-all duration-200 hover:scale-[1.03]",
+    "flex relative w-full h-full transition-all duration-200 hover:scale-[1.03] transform-gpu [backface-visibility:hidden]",
     additionalClasses
   );
 

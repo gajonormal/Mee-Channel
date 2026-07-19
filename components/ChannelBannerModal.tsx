@@ -15,18 +15,30 @@ export default function ChannelBannerModal() {
   const { activeBanner, closeBanner } = useChannelBanner();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [show, setShow] = useState(false);
+  const closeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (activeBanner) {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = null;
+      }
+
       setShow(true);
       setIsClosing(false);
       setIsExpanded(false);
+      setIsTransitioning(true);
 
       // Timeout de 30ms para o DOM processar o scale antes da sequer começar
       // O react borra-se todo se tirar isto
       const timer = setTimeout(() => {
         setIsExpanded(true);
+        // O transition dura 900ms. Depois disso acaba a transição
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 900);
       }, 30);
       
       return () => clearTimeout(timer);
@@ -35,12 +47,15 @@ export default function ChannelBannerModal() {
 
   const handleClose = () => {
     setIsClosing(true);
+    setIsTransitioning(true);
 
-    // Damos 950ms de margem para a animação de fecho 
-    setTimeout(() => {
+    // Damos 1150ms de margem para a animação de fecho 
+    closeTimeoutRef.current = setTimeout(() => {
       closeBanner();
       setShow(false);
-    }, 950);
+      setIsTransitioning(false);
+      closeTimeoutRef.current = null;
+    }, 1150);
   };
 
   if (!show || !activeBanner) return null;
@@ -58,7 +73,7 @@ export default function ChannelBannerModal() {
         opacity: 0,
         transformOrigin: "top left",
         willChange: "transform, opacity",
-        transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out 0.5s", // Fade out starts 100ms before the shrink finishes
+        transition: "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out 0.7s", // Fade out starts 100ms before the shrink finishes
       };
     } else if (isExpanded) {
       currentStyle = {
@@ -66,7 +81,7 @@ export default function ChannelBannerModal() {
         opacity: 1,
         transformOrigin: "top left",
         willChange: "transform, opacity",
-        transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)", 
+        transition: "transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)", 
       };
     } else {
       // Estado inicial do card
@@ -103,27 +118,23 @@ export default function ChannelBannerModal() {
       {/* O background preto tipo como fica na wii */}
       <div 
         className={`absolute inset-0 bg-black transition-opacity ${isClosing ? "opacity-0" : "opacity-100"}`} 
-        style={{ transitionDuration: isClosing ? '600ms' : '800ms' }}
+        style={{ transitionDuration: isClosing ? '800ms' : '600ms' }}
       />
 
       {/* O squircle expande com o modal */}
       <div 
-        className="absolute inset-0 flex flex-col bg-[#f0f4f8] pointer-events-auto shadow-[inset_0_0_20px_rgba(0,0,0,0.1)]"
+        className="absolute inset-0 bg-[#f0f4f8] pointer-events-auto shadow-[inset_0_0_20px_rgba(0,0,0,0.1)]"
         style={{ ...currentStyle, ...maskStyle }}
       >
-        {/* Grid de fundo mas vou mudar depois */}
-        <div 
-          className="absolute inset-0 opacity-20 pointer-events-none"
-          style={{
-            backgroundImage: 'linear-gradient(#00b0f0 1px, transparent 1px), linear-gradient(90deg, #00b0f0 1px, transparent 1px)',
-            backgroundSize: '40px 40px'
-          }}
-        />
 
         {/* Conteudo do banner */}
-        <div className="flex-1 relative w-full h-full flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           {activeBanner.bannerContent ? (
-            activeBanner.bannerContent
+            React.isValidElement(activeBanner.bannerContent)
+              ? typeof (activeBanner.bannerContent as React.ReactElement<any>).type === 'string'
+                ? activeBanner.bannerContent
+                : React.cloneElement(activeBanner.bannerContent as React.ReactElement<any>, { isAnimating: isClosing })
+              : activeBanner.bannerContent
           ) : (
             <div className="text-4xl text-[#888] font-bold">
               {activeBanner.title}
@@ -132,20 +143,27 @@ export default function ChannelBannerModal() {
         </div>
 
         {/* Barra de baixo com os dois botões ja clicaveis */}
-        <div className="relative w-full h-[90px] sm:h-[110px] bg-[#DDE1E4] flex items-center justify-center shrink-0 border-t-2 border-[#C5C7CA] shadow-[inset_0_12px_20px_-8px_rgba(0,0,0,0.25)]">
+        <div 
+          className="absolute bottom-0 w-full h-[90px] sm:h-[110px] bg-[#DDE1E4] flex items-center justify-center border-t-2 border-[#C5C7CA] shadow-[inset_0_12px_20px_-8px_rgba(0,0,0,0.25)] z-50"
+          style={{
+            transform: isExpanded && !isClosing ? 'translateY(0)' : 'translateY(100%)',
+            transition: isClosing ? 'transform 350ms ease-in' : 'transform 900ms cubic-bezier(0.16, 1, 0.3, 1)',
+            willChange: 'transform'
+          }}
+        >
           {/* Scanlines na barra como na Wii */}
           <div 
             className="absolute inset-0 opacity-10 pointer-events-none"
             style={{ backgroundImage: 'repeating-linear-gradient(transparent, transparent 2px, #000 2px, #000 4px)' }}
           />
 
-          <div className="relative z-10 w-full max-w-4xl px-8 flex justify-center items-center gap-8 sm:gap-24">
+          <div className="relative z-10 w-full max-w-4xl px-8 flex justify-center items-center gap-6 sm:gap-12">
             {/* Voltar atras */}
             <button 
               onClick={handleClose}
-              className="group relative px-6 py-2 sm:px-10 sm:py-3 rounded-full bg-gradient-to-b from-white to-[#E5E5E5] border-2 border-[#C5C7CA] hover:border-[#00b0f0] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_0_15px_rgba(0,176,240,0.4)] transition-all active:scale-95"
+              className="group relative flex items-center justify-center w-36 sm:w-56 h-14 sm:h-20 rounded-full bg-gradient-to-b from-white to-[#E5E5E5] border-2 border-[#C5C7CA] hover:border-[#00b0f0] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_0_15px_rgba(0,176,240,0.4)] transition-all active:scale-95"
             >
-              <span className="text-[#666] group-hover:text-[#00b0f0] font-medium text-lg sm:text-2xl transition-colors tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>
+              <span className="text-[#666] group-hover:text-[#00b0f0] font-medium text-xl sm:text-3xl transition-colors tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>
                 Menu
               </span>
             </button>
@@ -155,9 +173,9 @@ export default function ChannelBannerModal() {
               href={activeBanner.href}
               target="_blank"
               onClick={handleClose}
-              className="group relative px-8 py-2 sm:px-14 sm:py-3 rounded-full bg-gradient-to-b from-white to-[#E5E5E5] border-2 border-[#C5C7CA] hover:border-[#00b0f0] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_0_15px_rgba(0,176,240,0.4)] transition-all active:scale-95"
+              className="group relative flex items-center justify-center w-36 sm:w-56 h-14 sm:h-20 rounded-full bg-gradient-to-b from-white to-[#E5E5E5] border-2 border-[#C5C7CA] hover:border-[#00b0f0] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_0_15px_rgba(0,176,240,0.4)] transition-all active:scale-95"
             >
-              <span className="text-[#666] group-hover:text-[#00b0f0] font-medium text-lg sm:text-2xl transition-colors tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>
+              <span className="text-[#666] group-hover:text-[#00b0f0] font-medium text-xl sm:text-3xl transition-colors tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>
                 Start
               </span>
             </Link>

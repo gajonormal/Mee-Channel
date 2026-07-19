@@ -1,9 +1,34 @@
 import Card from "../Card";
+import { useChannelBanner } from "../ChannelBannerContext";
 
 export default function AboutMeCard() {
+  const { openBanner } = useChannelBanner();
+
+  const handleOpen = (rect?: DOMRect) => {
+    openBanner({
+      id: "about-me",
+      title: "About Me",
+      href: "#",
+      originRect: rect,
+      bannerContent: (
+        <div className="flex flex-col items-center justify-center animate-bounce-slow">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/assets/Mii_head.png" 
+            alt="Mii" 
+            className="w-48 h-48 drop-shadow-[0_15px_25px_rgba(0,0,0,0.4)] transition-transform hover:scale-110" 
+          />
+          <h2 className="text-3xl mt-6 text-[#555] font-bold tracking-widest drop-shadow-md text-center">
+            Estudante & Dev
+          </h2>
+        </div>
+      ),
+    });
+  };
+
   return (
     <Card
-      href=""
+      onClick={handleOpen}
       additionalClasses="hover:scale-100 bg-[#ffe97a]"
     >
       <div className="overflow-hidden flex relative w-full h-full rounded-3xl">

@@ -19,7 +19,14 @@ export default function Cursor() {
           cursorRef.current.style.transform = `translate3d(${e.clientX - 12}px, ${e.clientY - 12}px, 0)`;
         }
         
-        if (!isVisibleRef.current) {
+        // Se bater nos limites do ecrã, esconde o cursor
+        // Tolerância de 2px para apanhar movimentos rápidos que "saltam" o pixel 0
+        if (e.clientX <= 2 || e.clientY <= 2 || e.clientX >= window.innerWidth - 2 || e.clientY >= window.innerHeight - 2) {
+          if (isVisibleRef.current) {
+            isVisibleRef.current = false;
+            setIsVisible(false);
+          }
+        } else if (!isVisibleRef.current) {
           isVisibleRef.current = true;
           setIsVisible(true);
         }
@@ -31,31 +38,45 @@ export default function Cursor() {
       setIsVisible(false);
     };
     
+    // Fallback robusto para quando o rato sai da janela rapidamente
+    const handleMouseOut = (e: MouseEvent) => {
+      const rt = e.relatedTarget as HTMLElement | null;
+      // Se formos para null (fora do browser) ou para a tag HTML (fora do body)
+      if (!rt || rt.nodeName === "HTML") {
+        isVisibleRef.current = false;
+        setIsVisible(false);
+      }
+    };
+    
     const handleMouseEnter = () => {
       isVisibleRef.current = true;
       setIsVisible(true);
     };
 
     window.addEventListener("mousemove", updatePosition, { passive: true });
+    window.addEventListener("mouseout", handleMouseOut);
+    window.addEventListener("blur", handleMouseLeave); // Se clicar fora da janela
     document.addEventListener("mouseleave", handleMouseLeave);
     document.addEventListener("mouseenter", handleMouseEnter);
+    document.documentElement.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
       window.removeEventListener("mousemove", updatePosition);
+      window.removeEventListener("mouseout", handleMouseOut);
+      window.removeEventListener("blur", handleMouseLeave);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.removeEventListener("mouseenter", handleMouseEnter);
+      document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
-
-  if (!isVisible) return null;
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `* { cursor: none !important; }` }} />
       <div 
         ref={cursorRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] will-change-transform"
+        className={`fixed top-0 left-0 pointer-events-none z-[9999] will-change-transform transition-opacity duration-150 ease-out ${isVisible ? "opacity-100" : "opacity-0"}`}
         style={{ transform: "translate3d(-100px, -100px, 0)" }}
       >
         {/* Sombra */}

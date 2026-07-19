@@ -1,9 +1,43 @@
 import Card from "../Card";
+import { useChannelBanner } from "../ChannelBannerContext";
 
 export default function VisitARCard() {
+  const { openBanner } = useChannelBanner();
+
+  const handleOpen = (rect?: DOMRect) => {
+    openBanner({
+      id: "visitar",
+      title: "VisitAR",
+      href: "#",
+      originRect: rect,
+      bannerContent: (
+        <div className="flex flex-col items-center justify-center animate-bounce-slow">
+          <div className="relative mb-6">
+            <svg
+              className="w-40 h-40 drop-shadow-[0_0_20px_rgba(56,189,248,0.6)]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(56, 189, 248, 1)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <div className="absolute inset-0 bg-sky-400/20 blur-2xl rounded-full animate-pulse" />
+          </div>
+          <h2 className="text-3xl text-[#555] font-bold tracking-widest drop-shadow-md text-center">
+            TURISMO EM RA
+          </h2>
+        </div>
+      ),
+    });
+  };
+
   return (
     <Card
-      href="#"
+      onClick={handleOpen}
       additionalClasses="hover:scale-100 bg-gradient-to-br from-[#0a1628] to-[#0d3b6b]"
     >
       <div className="px-[22px] py-4 flex flex-col justify-end items-start text-white h-full overflow-hidden">
