@@ -40,12 +40,14 @@ export default function DiscordBanner({
     let width = 0;
     let height = 0;
     let s = 1;
+    let entranceStartTime: number | null = null; // moved up for resize access
+    let lastTime = performance.now();
+    let hasDrawn = false;
+    let isVisible = true;
 
     const resize = () => {
       if (!wrapRef.current) return;
       
-      // Use offsetWidth/offsetHeight instead of getBoundingClientRect() 
-      // so the canvas ignores CSS scale() transforms during modal animations!
       width = wrapRef.current.offsetWidth;
       height = wrapRef.current.offsetHeight;
       
@@ -77,23 +79,46 @@ export default function DiscordBanner({
           twinkleSpeed: Math.random() * 2.5 + 1.0 
         });
       }
+
+      // Always redraw on resize to prevent empty canvas if size was 0 initially
+      draw(performance.now());
     };
+    
+    // Optimização: Intersection Observer para não renderizar nem calcular animações fora do ecrã
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      isVisible = entry.isIntersecting;
+      
+      if (isVisible) {
+        // Quando volta a ser visível, retoma a animação se necessário
+        const rawTimeSinceEntrance = entranceStartTime ? (performance.now() - entranceStartTime) / 1000 : 0;
+        if (isAnimatingRef.current || rawTimeSinceEntrance < 1.8) {
+          if (!rafRef.current) {
+            lastTime = performance.now();
+            rafRef.current = requestAnimationFrame(loop);
+          }
+        } else {
+           draw(performance.now());
+        }
+      }
+    }, { threshold: 0.05 });
+
+    if (wrapRef.current) intersectionObserver.observe(wrapRef.current);
+    
     resize();
     window.addEventListener("resize", resize);
 
-    let lastTime = performance.now();
-    let entranceStartTime: number | null = null;
-    let hasDrawn = false;
 
-    const drawPlus = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+
+    function drawPlus(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
       ctx.beginPath();
       const thick = size * 0.3; 
       ctx.rect(x - size, y - thick, size * 2, thick * 2);
       ctx.rect(x - thick, y - size, thick * 2, size * 2);
       ctx.fill();
-    };
+    }
 
-    const drawDiamond = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+    function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
       ctx.beginPath();
       ctx.moveTo(x, y - size);
       ctx.lineTo(x + size * 0.85, y);
@@ -101,34 +126,38 @@ export default function DiscordBanner({
       ctx.lineTo(x - size * 0.85, y);
       ctx.closePath();
       ctx.fill();
-    };
+    }
 
-    const drawX = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+    function drawX(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
       ctx.beginPath();
       const s = size * 0.6;
       ctx.moveTo(x - s, y - s);
       ctx.lineTo(x + s, y + s);
       ctx.moveTo(x + s, y - s);
       ctx.lineTo(x - s, y + s);
-      ctx.strokeStyle = ctx.fillStyle;
+      ctx.strokeStyle = ctx.fillStyle as string;
       ctx.lineWidth = size * 0.3;
       ctx.stroke();
-    };
+    }
 
-    const drawCircle = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+    function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
       ctx.beginPath();
       ctx.arc(x, y, size * 0.7, 0, Math.PI * 2);
-      ctx.strokeStyle = ctx.fillStyle;
+      ctx.strokeStyle = ctx.fillStyle as string;
       ctx.lineWidth = size * 0.3;
       ctx.stroke();
-    };
+    }
 
-    const draw = (now: number) => {
+    function draw(now: number) {
+      if (!isVisible && hasDrawn) {
+        rafRef.current = null;
+        return;
+      }
+
       const dt = (now - lastTime) / 1000;
       lastTime = now;
 
       if (isAnimatingRef.current && hasDrawn) {
-        rafRef.current = requestAnimationFrame(draw);
         return;
       }
       
@@ -137,7 +166,8 @@ export default function DiscordBanner({
       }
       hasDrawn = true;
 
-      const timeSinceEntrance = entranceStartTime ? (now - entranceStartTime) / 1000 : 0;
+      const rawTimeSinceEntrance = entranceStartTime ? (now - entranceStartTime) / 1000 : 0;
+      const timeSinceEntrance = isAnimatingRef.current ? rawTimeSinceEntrance : Math.min(rawTimeSinceEntrance, 1.8);
       
       const globalAlpha = variant === "card" ? 1 : Math.min(timeSinceEntrance / 0.8, 1);
 
@@ -166,8 +196,11 @@ export default function DiscordBanner({
       for (let i = 0; i < particlesRef.current.length; i++) {
         const p = particlesRef.current[i] as any; 
         
-        p.x += p.speedX * dt;
-        p.y += p.speedY * dt;
+        // Only move physics if not frozen
+        if (timeSinceEntrance < 1.8) {
+          p.x += p.speedX * dt;
+          p.y += p.speedY * dt;
+        }
         
         let yFade = 1;
 
@@ -185,7 +218,8 @@ export default function DiscordBanner({
           if (p.y < 0 || p.y > height) p.speedY *= -1;
         }
 
-        const sine = (Math.sin(elapsed * p.twinkleSpeed + p.phase) + 1) / 2; 
+        const pulseTime = timeSinceEntrance >= 1.8 ? (entranceStartTime! / 1000 + 1.8) : elapsed;
+        const sine = (Math.sin(pulseTime * p.twinkleSpeed + p.phase) + 1) / 2; 
         const breathe = p.minOpacity + sine * (p.maxOpacity - p.minOpacity); 
         const finalOpacity = breathe * yFade;
         
@@ -211,12 +245,21 @@ export default function DiscordBanner({
 
       ctx.globalAlpha = 1;
 
-      rafRef.current = requestAnimationFrame(draw);
-    };
+      // Se estamos em modo card (!isAnimating), parar o requestAnimationFrame aos 1.8s
+      if (isAnimatingRef.current || rawTimeSinceEntrance < 1.8) {
+        rafRef.current = requestAnimationFrame(loop);
+      }
+    }
 
-    rafRef.current = requestAnimationFrame(draw);
+    function loop(now: number) {
+      draw(now);
+    }
+
+    // Iniciar o loop de animação
+    rafRef.current = requestAnimationFrame(loop);
 
     return () => {
+      intersectionObserver.disconnect();
       window.removeEventListener("resize", resize);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };

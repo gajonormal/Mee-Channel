@@ -6,6 +6,7 @@ interface CardProps {
   onClick?: (rect?: DOMRect) => void;
   additionalClasses?: string;
   soft?: boolean;
+  empty?: boolean;
   children: ReactNode;
 }
 
@@ -21,19 +22,23 @@ export default function Card({
   onClick,
   additionalClasses = "",
   soft = false,
+  empty = false,
   children,
 }: CardProps) {
   const filterId = useId().replace(/:/g, "");
 
   const shadowParentClass = clsx(
     "relative w-72 h-40 group block text-left transform-gpu",
-    soft 
-      ? "drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]" 
-      : "drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)] hover:[filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.12))_drop-shadow(0_0_8px_rgba(0,176,240,0.25))] transition-all duration-200"
+    empty 
+      ? "" // Sem sombra pesada para cards vazios
+      : soft 
+        ? "drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]" 
+        : "drop-shadow-[0_2px_4px_rgba(0,0,0,0.08)] hover:[filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.12))_drop-shadow(0_0_8px_rgba(0,176,240,0.25))] transition-all duration-200"
   );
 
   const maskedCardClass = clsx(
-    "flex relative w-full h-full transition-all duration-200 hover:scale-[1.03] transform-gpu [backface-visibility:hidden]",
+    "flex relative w-full h-full transition-all duration-200 transform-gpu [backface-visibility:hidden]",
+    !empty && "hover:scale-[1.03]",
     additionalClasses
   );
 
@@ -56,9 +61,9 @@ export default function Card({
       <svg className="absolute inset-0 pointer-events-none z-50" width="288" height="160" viewBox="0 0 288 160">
         <defs>
           <linearGradient id={`shading-${filterId}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="white" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="white" stopOpacity={empty ? "0.05" : "0.2"} />
             <stop offset="35%" stopColor="white" stopOpacity="0" />
-            <stop offset="100%" stopColor="black" stopOpacity="0.04" />
+            <stop offset="100%" stopColor="black" stopOpacity={empty ? "0.01" : "0.04"} />
           </linearGradient>
         </defs>
         
@@ -72,7 +77,10 @@ export default function Card({
           fill="none" 
           stroke="#B3B5B8" 
           strokeWidth="4" 
-          className="group-hover:stroke-[#00b0f0] group-hover:stroke-[4px] group-hover:drop-shadow-[0_0_4px_rgba(0,176,240,0.3)] transition-all duration-200" 
+          className={clsx(
+            "group-hover:stroke-[#00b0f0] group-hover:stroke-[4px] group-hover:drop-shadow-[0_0_4px_rgba(0,176,240,0.3)] transition-all duration-200",
+            empty ? "opacity-30 group-hover:opacity-60" : "opacity-100"
+          )} 
         />
       </svg>
     </>

@@ -121,9 +121,9 @@ export default function ChannelBannerModal() {
         style={{ transitionDuration: isClosing ? '800ms' : '600ms' }}
       />
 
-      {/* O squircle expande com o modal */}
+      {/* O container expande com o modal */}
       <div 
-        className="absolute inset-0 bg-[#f0f4f8] pointer-events-auto shadow-[inset_0_0_20px_rgba(0,0,0,0.1)]"
+        className="absolute inset-0 bg-[#f0f4f8] pointer-events-auto"
         style={{ ...currentStyle, ...maskStyle }}
       >
 

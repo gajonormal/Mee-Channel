@@ -15,8 +15,8 @@ export default function Cursor() {
       cancelAnimationFrame(animationFrameId);
       animationFrameId = requestAnimationFrame(() => {
         if (cursorRef.current) {
-          // translate3d obriga o browser a usar a GPU. Fica melhor assim, quem nao tiver gpu dedicada pode ter um derrame a tentar usar, ha sites piores
-          cursorRef.current.style.transform = `translate3d(${e.clientX - 12}px, ${e.clientY - 12}px, 0)`;
+          // translate3d obriga o browser a usar a GPU. Offset de -32px compensa o novo padding do viewBox no SVG
+          cursorRef.current.style.transform = `translate3d(${e.clientX - 32}px, ${e.clientY - 32}px, 0)`;
         }
         
         // Se bater nos limites do ecrã, esconde o cursor
@@ -79,23 +79,12 @@ export default function Cursor() {
         className={`fixed top-0 left-0 pointer-events-none z-[9999] will-change-transform transition-opacity duration-150 ease-out ${isVisible ? "opacity-100" : "opacity-0"}`}
         style={{ transform: "translate3d(-100px, -100px, 0)" }}
       >
-        {/* Sombra */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img 
-          src="/cursor.svg" 
-          alt="" 
-          className="absolute top-[4px] left-[3px] opacity-20" 
-          style={{ filter: "brightness(0) blur(2px)" }} 
-        />
-        {/* Cursor Real */}
+        {/* Cursor Real com filtros cozidos no SVG nativamente */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img 
           src="/cursor.svg" 
           alt="" 
           className="relative z-10" 
-          style={{ 
-            filter: "drop-shadow(0 0 4px rgba(0, 176, 240, 0.3)) drop-shadow(0 0 10px rgba(0, 176, 240, 0.15))" 
-          }}
         />
       </div>
     </>

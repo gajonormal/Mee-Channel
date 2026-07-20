@@ -25,7 +25,10 @@ export default function OportuniaCard() {
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
-            <div className="absolute inset-0 bg-orange-500/20 blur-2xl rounded-full animate-pulse" />
+            <div 
+              className="absolute inset-[10%] rounded-full animate-pulse" 
+              style={{ background: 'radial-gradient(circle, rgba(249, 115, 22, 0.5) 0%, transparent 70%)' }} 
+            />
           </div>
           <h2 className="text-3xl text-[#555] font-bold tracking-widest drop-shadow-md text-center">
             PLATAFORMA
@@ -66,7 +69,10 @@ export default function OportuniaCard() {
           alt=""
         />
         {/* glow a passar pelo card */}
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-12 rounded-full bg-orange-500/30 blur-xl group-hover:bg-orange-400/50 group-hover:scale-110 transition-all duration-500" />
+        <div 
+          className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full group-hover:scale-110 transition-all duration-500" 
+          style={{ background: 'radial-gradient(ellipse, rgba(249, 115, 22, 0.4) 0%, transparent 70%)' }} 
+        />
       </div>
     </Card>
   );

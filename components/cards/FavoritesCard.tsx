@@ -22,7 +22,7 @@ export default function FavoritesCard() {
             {favorites.map((fav, i) => (
               <div 
                 key={fav.label} 
-                className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-lg flex flex-col items-center gap-4 transition-transform hover:scale-110 hover:-translate-y-4"
+                className="bg-white/95 rounded-2xl p-6 border border-white/20 shadow-lg flex flex-col items-center gap-4 transition-transform hover:scale-110 hover:-translate-y-4"
                 style={{ animationDelay: `${i * 150}ms` }}
               >
                 <span className="text-6xl drop-shadow-md">{fav.emoji}</span>

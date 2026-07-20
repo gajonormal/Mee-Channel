@@ -2,7 +2,9 @@
 
 import Card from "../Card";
 import { useChannelBanner } from "../ChannelBannerContext";
-import GithubBanner from "../GithubBanner";
+import dynamic from 'next/dynamic';
+
+const GithubBanner = dynamic(() => import("../GithubBanner"), { ssr: false });
 
 export default function GithubCard() {
   const { openBanner } = useChannelBanner();

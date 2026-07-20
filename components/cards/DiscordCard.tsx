@@ -1,7 +1,9 @@
 import Card from "../Card";
 import { useChannelBanner } from "../ChannelBannerContext";
-import DiscordBanner from "../DiscordBanner";
 import React from "react";
+import dynamic from 'next/dynamic';
+
+const DiscordBanner = dynamic(() => import("../DiscordBanner"), { ssr: false });
 
 export default function DiscordCard() {
   const { openBanner } = useChannelBanner();

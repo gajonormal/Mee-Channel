@@ -25,7 +25,10 @@ export default function VisitARCard() {
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
-            <div className="absolute inset-0 bg-sky-400/20 blur-2xl rounded-full animate-pulse" />
+            <div 
+              className="absolute inset-[10%] rounded-full animate-pulse" 
+              style={{ background: 'radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, transparent 70%)' }} 
+            />
           </div>
           <h2 className="text-3xl text-[#555] font-bold tracking-widest drop-shadow-md text-center">
             TURISMO EM RA
