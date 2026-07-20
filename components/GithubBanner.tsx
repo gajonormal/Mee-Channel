@@ -21,19 +21,12 @@ function mulberry32(seed) {
   };
 }
 
-export default function GithubBanner({ isAnimating = false, variant = "banner" }: { isAnimating?: boolean, variant?: "banner" | "card" }) {
+export default function GithubBanner({ variant = "banner" }: { variant?: "banner" | "card" }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
   const bgDotsRef = useRef([]);
   const logoDotsRef = useRef([]);
   const rafRef = useRef(null);
-  const isAnimatingRef = useRef(isAnimating);
-
-  // Partículas removidas
-
-  useEffect(() => {
-    isAnimatingRef.current = isAnimating;
-  }, [isAnimating]);
 
   useEffect(() => {
     const rnd = mulberry32(1337);
@@ -120,7 +113,7 @@ export default function GithubBanner({ isAnimating = false, variant = "banner" }
     let t0 = null;
     let lastTime = performance.now();
     let hasDrawn = false;
-    let isVisible = true; // Assumimos visível até o observer dizer o contrário
+    let isVisible = variant === "banner" ? true : false; // Assumimos visível até o observer dizer o contrário para cards
     
     // Off-screen canvas para a grelha estática de fundo (Optimização)
     const bgCacheCanvas = document.createElement("canvas");
@@ -169,25 +162,25 @@ export default function GithubBanner({ isAnimating = false, variant = "banner" }
     
     // Optimização: Intersection Observer para não renderizar nem calcular animações fora do ecrã
     const intersectionObserver = new IntersectionObserver((entries) => {
+      if (variant === "banner") return;
       const entry = entries[0];
       isVisible = entry.isIntersecting;
       
       if (isVisible) {
         if (t0 === null) t0 = performance.now();
-        // Quando volta a ser visível, retoma a animação se necessário
-        if (isAnimatingRef.current || (t0 !== null && (performance.now() - t0) / 1000 < 1.8)) {
+        // Retoma a animação se necessário
+        if (t0 !== null && (performance.now() - t0) / 1000 < 1.8) {
           if (!rafRef.current) {
             lastTime = performance.now();
             rafRef.current = requestAnimationFrame(loop);
           }
         } else {
-           // Apenas garante que fica renderizado na ultima frame
            draw(performance.now());
         }
       }
     }, { threshold: 0.05 }); // Dispara assim que 5% da carta for visível
 
-    if (wrapRef.current) intersectionObserver.observe(wrapRef.current);
+    if (wrapRef.current && variant === "card") intersectionObserver.observe(wrapRef.current);
     
     resize();
     window.addEventListener("resize", resize);
@@ -217,16 +210,10 @@ export default function GithubBanner({ isAnimating = false, variant = "banner" }
 
       if (t0 === null) t0 = now;
 
-      if (isAnimatingRef.current && hasDrawn) {
-        t0 += (now - lastTime);
-        lastTime = now;
-        return;
-      }
       lastTime = now;
       hasDrawn = true;
 
-      const rawElapsed = (now - t0) / 1000;
-      const elapsed = isAnimatingRef.current ? rawElapsed : Math.min(rawElapsed, 1.8);
+      const elapsed = Math.min((now - t0) / 1000, 1.8);
       
       const rect = canvas.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
@@ -349,8 +336,7 @@ export default function GithubBanner({ isAnimating = false, variant = "banner" }
         }
       }
 
-      // Se estamos em modo card (!isAnimating), parar o requestAnimationFrame aos 1.8s
-      if (isAnimatingRef.current || rawElapsed < 1.8) {
+      if (elapsed < 1.8) {
         rafRef.current = requestAnimationFrame(loop);
       }
     }

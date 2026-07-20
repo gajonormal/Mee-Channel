@@ -3,24 +3,17 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function DiscordBanner({ 
-  isAnimating = false, 
   variant = "banner" 
 }: { 
-  isAnimating?: boolean; 
   variant?: "banner" | "card";
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const isAnimatingRef = useRef(isAnimating);
   const particlesRef = useRef<any[]>([]);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | null>(null);
 
   // For typing indicator animation (if we keep it)
   const [dotIndex, setDotIndex] = useState(0);
-
-  useEffect(() => {
-    isAnimatingRef.current = isAnimating;
-  }, [isAnimating]);
 
   useEffect(() => {
     if (variant === "banner") {
@@ -43,7 +36,7 @@ export default function DiscordBanner({
     let entranceStartTime: number | null = null; // moved up for resize access
     let lastTime = performance.now();
     let hasDrawn = false;
-    let isVisible = true;
+    let isVisible = variant === "banner" ? true : false;
 
     const resize = () => {
       if (!wrapRef.current) return;
@@ -86,13 +79,14 @@ export default function DiscordBanner({
     
     // Optimização: Intersection Observer para não renderizar nem calcular animações fora do ecrã
     const intersectionObserver = new IntersectionObserver((entries) => {
+      if (variant === "banner") return;
       const entry = entries[0];
       isVisible = entry.isIntersecting;
       
       if (isVisible) {
         // Quando volta a ser visível, retoma a animação se necessário
-        const rawTimeSinceEntrance = entranceStartTime ? (performance.now() - entranceStartTime) / 1000 : 0;
-        if (isAnimatingRef.current || rawTimeSinceEntrance < 1.8) {
+        const timeSinceEntrance = entranceStartTime ? (performance.now() - entranceStartTime) / 1000 : 0;
+        if (timeSinceEntrance < 1.8 || variant === "banner") {
           if (!rafRef.current) {
             lastTime = performance.now();
             rafRef.current = requestAnimationFrame(loop);
@@ -103,9 +97,11 @@ export default function DiscordBanner({
       }
     }, { threshold: 0.05 });
 
-    if (wrapRef.current) intersectionObserver.observe(wrapRef.current);
+    if (wrapRef.current && variant === "card") intersectionObserver.observe(wrapRef.current);
     
     resize();
+    const resizeObserver = new ResizeObserver(resize);
+    if (wrapRef.current) resizeObserver.observe(wrapRef.current);
     window.addEventListener("resize", resize);
 
 
@@ -157,17 +153,13 @@ export default function DiscordBanner({
       const dt = (now - lastTime) / 1000;
       lastTime = now;
 
-      if (isAnimatingRef.current && hasDrawn) {
-        return;
-      }
-      
-      if (!isAnimatingRef.current && entranceStartTime === null && hasDrawn) {
+      if (entranceStartTime === null && hasDrawn) {
         entranceStartTime = now;
       }
       hasDrawn = true;
 
       const rawTimeSinceEntrance = entranceStartTime ? (now - entranceStartTime) / 1000 : 0;
-      const timeSinceEntrance = isAnimatingRef.current ? rawTimeSinceEntrance : Math.min(rawTimeSinceEntrance, 1.8);
+      const timeSinceEntrance = variant === "card" ? Math.min(rawTimeSinceEntrance, 1.8) : rawTimeSinceEntrance;
       
       const globalAlpha = variant === "card" ? 1 : Math.min(timeSinceEntrance / 0.8, 1);
 
@@ -245,8 +237,7 @@ export default function DiscordBanner({
 
       ctx.globalAlpha = 1;
 
-      // Se estamos em modo card (!isAnimating), parar o requestAnimationFrame aos 1.8s
-      if (isAnimatingRef.current || rawTimeSinceEntrance < 1.8) {
+      if (timeSinceEntrance < 1.8) {
         rafRef.current = requestAnimationFrame(loop);
       }
     }
@@ -260,6 +251,7 @@ export default function DiscordBanner({
 
     return () => {
       intersectionObserver.disconnect();
+      resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
